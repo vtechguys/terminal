@@ -1,4 +1,5 @@
 #   Terminal in react.js
+Demo: [Demo Code pen](https://codepen.io/vtechguys/pen/mdJLePd)
 ### Todos
 
 - add option to provide commands

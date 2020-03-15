@@ -133,8 +133,7 @@ export default class Terminal extends React.Component {
         const newHistory = [...history];
         newHistory[index] = {
           ...newHistory[index],
-          result: `.   .env            .gitignore      node_modules    public          yarn.lock
-          ..              .git            README.md       package.json    src`
+          result: `async process result from server...may be??`
         };
 
         const stateMerge = {
@@ -226,12 +225,13 @@ export default class Terminal extends React.Component {
   }
   onChangeHandler(e) {
     let value = e.target.value;
-    if(value && value.trim().length > 0){
-  
-      return this.setState({
-        command: value
-      });
+    if(value && value.trim().length == 0){
+      return;
     }
+    return this.setState({
+      command: value
+    });
+    
     
   }
   applyStyles() {
