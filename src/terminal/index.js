@@ -121,7 +121,7 @@ export default class Terminal extends React.Component {
       fontSize: 16
     };
   }
-  pushCommand(id){
+  pushCommand(id, cmd, args){
     setTimeout(() => {
       const updater = prevState => {
         const { history } = prevState;
@@ -141,7 +141,7 @@ export default class Terminal extends React.Component {
           history: newHistory,
           isInputComplete: false,
           isProcessingComplete: true,
-          command: ""
+          command: "",
         };
         return stateMerge;
       };
@@ -181,7 +181,7 @@ export default class Terminal extends React.Component {
     };
     this.setState(updater);
     if(!isStaticCommand){
-      this.pushCommand(id);
+      this.pushCommand(id, cmd, args);
     }
     
   }
