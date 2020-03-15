@@ -121,27 +121,8 @@ export default class Terminal extends React.Component {
       fontSize: 16
     };
   }
-  handleEnterPress() {
-    const id = Date.now() + "_" + Math.floor(Math.random() * 100);
-    const updater = prevState => {
-      const { history, historyCursor, command } = prevState;
-      const currentCommand = {
-        id,
-        command,
-        result: null
-      };
-      const newHistory = history.concat(currentCommand);
-      const stateMerge = {
-        history: newHistory,
-        historyCursor: historyCursor + 1,
-        isInputComplete: true,
-        isProcessingComplete: false
-      };
-      return stateMerge;
-    };
-    this.setState(updater);
+  pushCommand(id){
     setTimeout(() => {
-      console.log("timeout");
       const updater = prevState => {
         const { history } = prevState;
         const index = history.findIndex(command => command.id === id);
@@ -166,6 +147,43 @@ export default class Terminal extends React.Component {
       };
       this.setState(updater);
     }, 1000);
+  }
+  handleEnterPress() {
+    const { commands } = this.props;
+    const stream = this.state.command.split(" ");
+    const cmd = stream[0];
+    stream.splice(0, 1);
+    const args = stream;
+    const isStaticCommand = commands && commands[cmd] ? true : false; 
+
+    const id = Date.now() + "_" + Math.floor(Math.random() * 100);
+    const updater = prevState => {
+      const { history, historyCursor, command } = prevState;
+      const currentCommand = {
+        id,
+        command,
+        result: null
+      };
+
+      const newHistory = history.concat(currentCommand);
+      const stateMerge = {
+        history: newHistory,
+        historyCursor: historyCursor + 1,
+        isInputComplete: true,
+        isProcessingComplete: false
+      };
+      if(isStaticCommand){
+        stateMerge.isProcessingComplete = true;
+        stateMerge.command = "";
+        newHistory[newHistory.length - 1].result = commands[cmd].fn(...args);
+      }
+      return stateMerge;
+    };
+    this.setState(updater);
+    if(!isStaticCommand){
+      this.pushCommand(id);
+    }
+    
   }
   handleUpDownKeys(isUpperKey = true) {
     const updater = prevState => {
@@ -193,7 +211,7 @@ export default class Terminal extends React.Component {
     this.setState(updater);
   }
   handleEscKey() {
-    console.log("esc");
+    console.log("escape key");
   }
   onKeyUpHandler(e) {
     e.preventDefault();
@@ -207,9 +225,14 @@ export default class Terminal extends React.Component {
     }
   }
   onChangeHandler(e) {
-    this.setState({
-      command: e.target.value.trim()
-    });
+    let value = e.target.value;
+    if(value && value.trim().length > 0){
+  
+      return this.setState({
+        command: value
+      });
+    }
+    
   }
   applyStyles() {
     const { style } = this.props;
@@ -227,7 +250,6 @@ export default class Terminal extends React.Component {
     let jsx = null;
     if (history && history.length > 0) {
       const listPrevious = history.map(command => {
-        console.log(command);
         return (
           <LineOutput
             key={command.id}
